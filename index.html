@@ -437,12 +437,122 @@
             margin: 20px 0;
             font-weight: bold;
         }
+
+        .difficulty-btn {
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .phase-indicator {
+            font-size: 16px;
+            color: #ffeb3b;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .pause-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 31, 63, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .pause-overlay.active {
+            display: flex;
+        }
+
+        .pause-menu {
+            background: #003366;
+            border: 6px solid #ffd700;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .pause-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ffd700;
+            color: #001f3f;
+            border: 3px solid #ffd700;
+            padding: 10px 20px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .pause-btn:hover {
+            background: #ffeb3b;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- Welcome Screen -->
-        <div class="screen active" id="welcomeScreen">
+        <!-- Intro Screen 1: What This Is -->
+        <div class="screen active" id="introScreen1">
+            <h1 class="game-title">PERSUADE ARCADE</h1>
+            <div style="font-size: 64px; margin: 30px 0;">🎮</div>
+            <p class="subtitle" style="font-size: 18px; margin: 20px 0;">Practice CONVINCING people in English!</p>
+            <p class="translation" style="font-size: 14px;">Practica CONVENCER en inglés!</p>
+            <button id="intro1NextBtn" style="margin-top: 50px;">NEXT / SIGUIENTE →</button>
+        </div>
+
+        <!-- Intro Screen 2: How It Works -->
+        <div class="screen" id="introScreen2">
+            <h2 class="subtitle" style="font-size: 24px; margin-bottom: 40px;">HOW TO PLAY / CÓMO JUGAR</h2>
+            <div style="text-align: left; max-width: 600px; margin: 0 auto; font-size: 12px; line-height: 2;">
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 24px;">1️⃣</span> <strong>Get a situation</strong> (You freeze the game)<br>
+                    <span style="color: #87ceeb; margin-left: 40px;">Obtén una situación (Congelas el juego)</span>
+                </div>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 24px;">2️⃣</span> <strong>Read & prepare</strong> (You get help words)<br>
+                    <span style="color: #87ceeb; margin-left: 40px;">Lee y prepárate (Recibes palabras de ayuda)</span>
+                </div>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 24px;">3️⃣</span> <strong>Convince your partner</strong> (Speak for 2 minutes)<br>
+                    <span style="color: #87ceeb; margin-left: 40px;">Convence a tu compañero (Habla por 2 minutos)</span>
+                </div>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 24px;">4️⃣</span> <strong>Your partner scores you</strong><br>
+                    <span style="color: #87ceeb; margin-left: 40px;">Tu compañero te califica</span>
+                </div>
+            </div>
+            <button id="intro2NextBtn" style="margin-top: 40px;">GOT IT / ENTENDIDO →</button>
+        </div>
+
+        <!-- Difficulty Selection Screen -->
+        <div class="screen" id="difficultyScreen">
+            <h2 class="subtitle" style="font-size: 24px; margin-bottom: 30px;">CHOOSE DIFFICULTY / ELIGE DIFICULTAD</h2>
+            <div style="max-width: 500px; margin: 0 auto;">
+                <button class="difficulty-btn" data-difficulty="easy" style="margin: 15px 0; width: 100%; padding: 20px; font-size: 12px;">
+                    <div style="font-size: 20px; margin-bottom: 8px;">⭐ EASY / FÁCIL</div>
+                    <div style="font-size: 9px; color: #87ceeb;">Familiar situations, simple words<br>Situaciones familiares, palabras simples</div>
+                </button>
+                <button class="difficulty-btn" data-difficulty="medium" style="margin: 15px 0; width: 100%; padding: 20px; font-size: 12px; border: 4px solid #ffeb3b;">
+                    <div style="font-size: 20px; margin-bottom: 8px;">⭐⭐ MEDIUM / MEDIO (Recommended)</div>
+                    <div style="font-size: 9px; color: #87ceeb;">School & friend topics<br>Temas de escuela y amigos</div>
+                </button>
+                <button class="difficulty-btn" data-difficulty="hard" style="margin: 15px 0; width: 100%; padding: 20px; font-size: 12px;">
+                    <div style="font-size: 20px; margin-bottom: 8px;">⭐⭐⭐ HARD / DIFÍCIL</div>
+                    <div style="font-size: 9px; color: #87ceeb;">Complex reasoning<br>Razonamiento complejo</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Screen (Names) -->
+        <div class="screen" id="welcomeScreen">
             <h1 class="game-title">PERSUADE</h1>
             <p class="subtitle">~ SPEAKING GAME ~</p>
             <p class="translation">~ JUEGO DE HABLAR ~</p>
@@ -463,12 +573,15 @@
 
         <!-- Game Screen -->
         <div class="screen" id="gameScreen">
+            <button class="pause-btn" id="pauseBtn">⏸ PAUSE</button>
+
             <div class="score-header">
                 <div class="player-score" id="p1Score">P1: 0</div>
                 <div class="player-score" id="p2Score">P2: 0</div>
             </div>
 
             <div class="turn-indicator" id="turnText"></div>
+            <div class="phase-indicator" id="phaseText"></div>
             <div class="shuffle-container" id="shuffleContainer">
                 <div class="center-spotlight"></div>
             </div>
@@ -492,26 +605,69 @@
                     <div class="timer-fill" id="timerFill">120s</div>
                 </div>
 
-                <div class="scoring-container">
-                    <button class="score-button" data-score="3">
-                        <div class="emoji-icon">🔥</div>
-                        <div>EXCELLENT</div>
-                        <div class="score-spanish">Excelente</div>
-                        <div>+3</div>
-                    </button>
-                    <button class="score-button" data-score="2">
-                        <div class="emoji-icon">👍</div>
-                        <div>GOOD</div>
-                        <div class="score-spanish">Bien</div>
-                        <div>+2</div>
-                    </button>
-                    <button class="score-button" data-score="1">
-                        <div class="emoji-icon">🤔</div>
-                        <div>OK</div>
-                        <div class="score-spanish">Está bien</div>
-                        <div>+1</div>
-                    </button>
+                <div id="scoringSection" style="display: none; background: #002855; border: 3px solid #ffd700; padding: 20px; margin-top: 20px;">
+                    <h3 style="font-size: 14px; color: #ffd700; margin-bottom: 20px;">SCORE YOUR PARTNER / CALIFICA A TU COMPAÑERO</h3>
+
+                    <div style="margin: 15px 0;">
+                        <div style="font-size: 11px; color: #ffeb3b; margin-bottom: 8px;">Did they speak clearly? / ¿Hablaron claramente?</div>
+                        <div class="rubric-options">
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="clarity" value="0" style="margin-right: 8px;"> Hard to understand / Difícil de entender (0)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="clarity" value="1" style="margin-right: 8px;"> Mostly clear / Mayormente claro (1)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="clarity" value="2" style="margin-right: 8px;"> Very clear / Muy claro (2)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin: 15px 0;">
+                        <div style="font-size: 11px; color: #ffeb3b; margin-bottom: 8px;">Did they give reasons? / ¿Dieron razones?</div>
+                        <div class="rubric-options">
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="reasons" value="0" style="margin-right: 8px;"> No reasons / Sin razones (0)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="reasons" value="1" style="margin-right: 8px;"> One reason / Una razón (1)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="reasons" value="2" style="margin-right: 8px;"> Two or more / Dos o más (2)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin: 15px 0;">
+                        <div style="font-size: 11px; color: #ffeb3b; margin-bottom: 8px;">Did they use new words? / ¿Usaron palabras nuevas?</div>
+                        <div class="rubric-options">
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="vocabulary" value="0" style="margin-right: 8px;"> No new words / Sin palabras nuevas (0)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="vocabulary" value="1" style="margin-right: 8px;"> 1-2 new words / 1-2 palabras (1)
+                            </label>
+                            <label style="display: block; margin: 5px 0; font-size: 10px; color: #ffd700;">
+                                <input type="radio" name="vocabulary" value="2" style="margin-right: 8px;"> 3+ new words / 3+ palabras (2)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ffd700;">
+                        <div id="scoreTotal" style="font-size: 16px; color: #ffeb3b; margin-bottom: 15px;">Select all options to see score</div>
+                        <button id="submitScoreBtn" style="width: 100%;" disabled>NEXT ROUND / SIGUIENTE →</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div class="pause-overlay" id="pauseOverlay">
+            <div class="pause-menu">
+                <h2 style="font-size: 32px; color: #ffd700; margin-bottom: 20px;">⏸ PAUSED</h2>
+                <p style="font-size: 12px; color: #87ceeb; margin-bottom: 30px;">Game is paused / Juego en pausa</p>
+                <button id="resumeBtn" style="margin: 10px;">▶ RESUME / CONTINUAR</button>
+                <button id="quitBtn" style="margin: 10px; background: #ff4500; border-color: #ff4500;">🏠 QUIT / SALIR</button>
             </div>
         </div>
 
@@ -529,6 +685,7 @@
         const scenarios = [
             {
                 id: 1,
+                difficulty: 'easy',
                 emoji: '🍕',
                 text: 'Your friend has chips but says NO. Convince them to share with you!',
                 translation: 'Tu amigo tiene papas pero dice NO. ¡Convéncelo de compartir contigo!',
@@ -546,6 +703,7 @@
             },
             {
                 id: 2,
+                difficulty: 'easy',
                 emoji: '⚽',
                 text: 'Your friend wants to sit inside. Convince them to play soccer at lunch!',
                 translation: 'Tu amigo quiere sentarse adentro. ¡Convéncelo de jugar fútbol en el almuerzo!',
@@ -563,6 +721,7 @@
             },
             {
                 id: 3,
+                difficulty: 'medium',
                 emoji: '✏️',
                 text: 'Your friend says NO pencils. You have a test! Convince them to help you.',
                 translation: 'Tu amigo dice NO lápices. ¡Tienes un examen! Convéncelo de ayudarte.',
@@ -580,6 +739,7 @@
             },
             {
                 id: 4,
+                difficulty: 'medium',
                 emoji: '🎮',
                 text: 'The teacher says NO games. You finished all your work early. Convince the teacher!',
                 translation: 'El maestro dice NO juegos. Terminaste todo tu trabajo temprano. ¡Convence al maestro!',
@@ -597,6 +757,7 @@
             },
             {
                 id: 5,
+                difficulty: 'easy',
                 emoji: '🪑',
                 text: 'Someone took your seat and says NO. Convince them you need this seat!',
                 translation: 'Alguien tomó tu asiento y dice NO. ¡Convéncelo de que necesitas este asiento!',
@@ -614,6 +775,7 @@
             },
             {
                 id: 6,
+                difficulty: 'medium',
                 emoji: '👥',
                 text: 'The teacher says work alone. Convince the teacher you work better with a partner!',
                 translation: 'El maestro dice trabajar solo. ¡Convence al maestro de que trabajas mejor con un compañero!',
@@ -631,6 +793,7 @@
             },
             {
                 id: 7,
+                difficulty: 'hard',
                 emoji: '🚽',
                 text: 'The teacher says wait until lunch. You REALLY need to go! Convince the teacher NOW.',
                 translation: 'El maestro dice esperar hasta el almuerzo. ¡REALMENTE necesitas ir! Convence al maestro AHORA.',
@@ -648,6 +811,7 @@
             },
             {
                 id: 8,
+                difficulty: 'medium',
                 emoji: '📱',
                 text: 'The teacher says NO phone. Your mom is picking you up early! Convince the teacher.',
                 translation: 'El maestro dice NO teléfono. ¡Tu mamá te recogerá temprano! Convence al maestro.',
@@ -665,6 +829,7 @@
             },
             {
                 id: 9,
+                difficulty: 'medium',
                 emoji: '🎧',
                 text: 'The teacher says NO music in class. Convince the teacher music helps you work!',
                 translation: 'El maestro dice NO música en clase. ¡Convence al maestro de que la música te ayuda a trabajar!',
@@ -682,6 +847,7 @@
             },
             {
                 id: 10,
+                difficulty: 'medium',
                 emoji: '🏃',
                 text: 'The teacher wants gym class inside. The weather is perfect! Convince the teacher to go outside.',
                 translation: 'El maestro quiere clase de gimnasia adentro. ¡El clima está perfecto! Convence al maestro de ir afuera.',
@@ -699,6 +865,7 @@
             },
             {
                 id: 11,
+                difficulty: 'easy',
                 emoji: '🍕',
                 text: 'Your mom made dinner but you want pizza! Convince your mom to order pizza tonight.',
                 translation: '¡Tu mamá hizo cena pero tú quieres pizza! Convence a tu mamá de ordenar pizza esta noche.',
@@ -716,6 +883,7 @@
             },
             {
                 id: 12,
+                difficulty: 'easy',
                 emoji: '🎮',
                 text: 'Your friend wants to play a different game. Convince them to play YOUR game!',
                 translation: 'Tu amigo quiere jugar un juego diferente. ¡Convéncelo de jugar TU juego!',
@@ -733,6 +901,7 @@
             },
             {
                 id: 13,
+                difficulty: 'hard',
                 emoji: '😴',
                 text: 'Your parent says go to bed. You are not tired! Convince them you can stay up 30 more minutes.',
                 translation: 'Tu padre/madre dice ir a dormir. ¡No estás cansado! Convéncelos de que puedes quedarte despierto 30 minutos más.',
@@ -750,6 +919,7 @@
             },
             {
                 id: 14,
+                difficulty: 'medium',
                 emoji: '🎂',
                 text: 'Your friend forgot your birthday! Convince them to celebrate with you this weekend.',
                 translation: '¡Tu amigo olvidó tu cumpleaños! Convéncelo de celebrar contigo este fin de semana.',
@@ -767,6 +937,7 @@
             },
             {
                 id: 15,
+                difficulty: 'easy',
                 emoji: '📺',
                 text: 'Your sibling has the remote. They are watching a baby show! Convince them to change it.',
                 translation: 'Tu hermano/hermana tiene el control. ¡Están viendo un programa para bebés! Convéncelos de cambiarlo.',
@@ -784,6 +955,7 @@
             },
             {
                 id: 16,
+                difficulty: 'hard',
                 emoji: '🏀',
                 text: 'You are losing in basketball. Your team wants to quit! Convince them to keep playing.',
                 translation: 'Están perdiendo en baloncesto. ¡Tu equipo quiere rendirse! Convéncelos de seguir jugando.',
@@ -801,6 +973,7 @@
             },
             {
                 id: 17,
+                difficulty: 'medium',
                 emoji: '🍟',
                 text: 'Your parent says no fast food. You are SO hungry! Convince them to stop at a restaurant.',
                 translation: 'Tu padre/madre dice no comida rápida. ¡Tienes MUCHA hambre! Convéncelos de parar en un restaurante.',
@@ -818,6 +991,7 @@
             },
             {
                 id: 18,
+                difficulty: 'hard',
                 emoji: '🐕',
                 text: 'Your parent says dogs are too much work. Convince them you can take care of a dog!',
                 translation: 'Tu padre/madre dice que los perros son mucho trabajo. ¡Convéncelos de que puedes cuidar un perro!',
@@ -835,6 +1009,7 @@
             },
             {
                 id: 19,
+                difficulty: 'hard',
                 emoji: '🎒',
                 text: 'Group project! Nobody wants to work with the new kid. Convince your group to include them.',
                 translation: '¡Proyecto en grupo! Nadie quiere trabajar con el chico nuevo. Convence a tu grupo de incluirlo.',
@@ -852,6 +1027,7 @@
             },
             {
                 id: 20,
+                difficulty: 'medium',
                 emoji: '💰',
                 text: 'Your friend owes you $5 but says "tomorrow." You need it NOW! Convince them to pay you today.',
                 translation: 'Tu amigo te debe $5 pero dice "mañana." ¡Lo necesitas AHORA! Convéncelo de pagarte hoy.',
@@ -869,6 +1045,7 @@
             },
             {
                 id: 21,
+                difficulty: 'medium',
                 emoji: '🎧',
                 text: 'Your friend took your headphones without asking! Convince them that is not okay.',
                 translation: '¡Tu amigo tomó tus audífonos sin pedir! Convéncelo de que eso no está bien.',
@@ -886,6 +1063,7 @@
             },
             {
                 id: 22,
+                difficulty: 'easy',
                 emoji: '🏠',
                 text: 'Your friend can come over but only for 1 hour. Convince your parent to let them stay longer!',
                 translation: 'Tu amigo puede venir pero solo por 1 hora. ¡Convence a tu padre/madre de dejarlo quedarse más tiempo!',
@@ -903,6 +1081,7 @@
             },
             {
                 id: 23,
+                difficulty: 'medium',
                 emoji: '🎨',
                 text: 'Art class! Everyone wants to paint. Convince the class to do a group mural instead!',
                 translation: '¡Clase de arte! Todos quieren pintar. ¡Convence a la clase de hacer un mural en grupo!',
@@ -920,6 +1099,7 @@
             },
             {
                 id: 24,
+                difficulty: 'hard',
                 emoji: '🚗',
                 text: 'Your parent says walk home. It is raining! Convince them to pick you up from school.',
                 translation: 'Tu padre/madre dice caminar a casa. ¡Está lloviendo! Convéncelos de recogerte de la escuela.',
@@ -937,6 +1117,7 @@
             },
             {
                 id: 25,
+                difficulty: 'hard',
                 emoji: '🎉',
                 text: 'There is a school dance but your parent says no. Convince them to let you go!',
                 translation: 'Hay un baile escolar pero tu padre/madre dice no. ¡Convéncelos de dejarte ir!',
@@ -962,22 +1143,43 @@
             round: 0,
             timerInt: null,
             shuffleInt: null,
-            emojis: []
+            emojis: [],
+            difficulty: 'medium',
+            currentPhase: null, // 'read', 'prepare', 'speak'
+            isPaused: false
         };
 
         // Setup
+        document.getElementById('intro1NextBtn').addEventListener('click', () => showScreen('introScreen2'));
+        document.getElementById('intro2NextBtn').addEventListener('click', () => showScreen('difficultyScreen'));
+
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                game.difficulty = btn.dataset.difficulty;
+                showScreen('welcomeScreen');
+            });
+        });
+
         document.getElementById('p1Name').addEventListener('input', updateStartBtn);
         document.getElementById('p2Name').addEventListener('input', updateStartBtn);
         document.getElementById('startBtn').addEventListener('click', startGame);
         document.getElementById('activateBtn').addEventListener('click', freezeShuffle);
         document.getElementById('playAgainBtn').addEventListener('click', reset);
 
-        document.querySelectorAll('.score-button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const pts = parseInt(btn.dataset.score);
-                score(pts);
-            });
+        document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+        document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+        document.getElementById('quitBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to quit? / ¿Seguro que quieres salir?')) {
+                reset();
+            }
         });
+
+        // Rubric scoring
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', updateScore);
+        });
+
+        document.getElementById('submitScoreBtn').addEventListener('click', submitScore);
 
         function updateStartBtn() {
             const p1 = document.getElementById('p1Name').value.trim();
@@ -988,7 +1190,10 @@
         function startGame() {
             game.p1.name = document.getElementById('p1Name').value.trim();
             game.p2.name = document.getElementById('p2Name').value.trim();
-            game.remaining = [...scenarios].sort(() => Math.random() - 0.5);
+
+            // Filter scenarios by difficulty
+            const filteredScenarios = scenarios.filter(s => s.difficulty === game.difficulty);
+            game.remaining = [...filteredScenarios].sort(() => Math.random() - 0.5);
 
             showScreen('gameScreen');
             updateUI();
@@ -1089,8 +1294,31 @@
         }
 
         function showQuestion(scenario) {
+            game.currentScenario = scenario;
+
+            // Phase 1: READ (30 seconds) - Show scenario only
+            game.currentPhase = 'read';
+            document.getElementById('phaseText').textContent = '📖 READING TIME / TIEMPO DE LECTURA';
             document.getElementById('questionText').textContent = scenario.text;
             document.getElementById('questionTranslation').textContent = scenario.translation;
+
+            // Hide vocab and frames initially
+            document.querySelector('.vocab-box').style.display = 'none';
+            document.querySelector('.sentence-frames').style.display = 'none';
+            document.getElementById('scoringSection').style.display = 'none';
+
+            document.getElementById('questionDiv').style.display = 'block';
+
+            // Start Phase 1 timer (30 seconds)
+            startPhaseTimer(30, 'read', () => {
+                // Phase 2: PREPARE (45 seconds) - Show vocab and frames
+                startPreparePhase(scenario);
+            });
+        }
+
+        function startPreparePhase(scenario) {
+            game.currentPhase = 'prepare';
+            document.getElementById('phaseText').textContent = '💡 PREPARATION TIME / TIEMPO DE PREPARACIÓN';
 
             // Show vocabulary
             const vocabHtml = scenario.vocab.map(v =>
@@ -1104,29 +1332,113 @@
             ).join('');
             document.getElementById('framesList').innerHTML = framesHtml;
 
-            document.getElementById('questionDiv').style.display = 'block';
-            document.querySelectorAll('.score-button').forEach(b => b.disabled = false);
+            document.querySelector('.vocab-box').style.display = 'block';
+            document.querySelector('.sentence-frames').style.display = 'block';
+
+            // Start Phase 2 timer (45 seconds)
+            startPhaseTimer(45, 'prepare', () => {
+                // Phase 3: SPEAK (90 seconds)
+                startSpeakPhase(scenario);
+            });
         }
 
-        function startTimer() {
-            let sec = 120; // Extended to 120 seconds for beginners
+        function startSpeakPhase(scenario) {
+            game.currentPhase = 'speak';
+            const speaker = game[`p${game.currentPlayer}`].name.toUpperCase();
+            document.getElementById('phaseText').textContent = `🎤 ${speaker} - SPEAK NOW! / ¡HABLA AHORA!`;
+
+            // Simplify view - keep scenario and key helpers visible
+            document.querySelector('.vocab-box').style.opacity = '0.7';
+            document.querySelector('.sentence-frames').style.opacity = '0.7';
+
+            // Start Phase 3 timer (90 seconds)
+            startPhaseTimer(90, 'speak', () => {
+                // Time's up - show scoring
+                showScoring();
+            });
+        }
+
+        function showScoring() {
+            clearInterval(game.timerInt);
+            game.currentPhase = 'scoring';
+            document.getElementById('phaseText').textContent = '📊 TIME TO SCORE / HORA DE CALIFICAR';
+
+            // Hide question details, show scoring
+            document.getElementById('questionDiv').style.display = 'none';
+            document.getElementById('scoringSection').style.display = 'block';
+
+            // Reset radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.getElementById('scoreTotal').textContent = 'Select all options to see score';
+            document.getElementById('submitScoreBtn').disabled = true;
+        }
+
+        function startPhaseTimer(duration, phase, onComplete) {
+            let sec = duration;
             const fill = document.getElementById('timerFill');
+            const totalDuration = duration;
+
+            clearInterval(game.timerInt);
 
             game.timerInt = setInterval(() => {
+                if (game.isPaused) return;
+
                 sec--;
-                const pct = (sec / 120) * 100;
+                const pct = (sec / totalDuration) * 100;
                 fill.style.width = pct + '%';
                 fill.textContent = sec + 's';
 
                 fill.className = 'timer-fill';
-                if (sec <= 40) fill.classList.add('warning');
-                if (sec <= 15) fill.classList.add('danger');
+                if (sec <= Math.floor(totalDuration * 0.33)) fill.classList.add('warning');
+                if (sec <= Math.floor(totalDuration * 0.15)) fill.classList.add('danger');
 
                 if (sec <= 0) {
                     clearInterval(game.timerInt);
-                    score(1);
+                    onComplete();
                 }
             }, 1000);
+        }
+
+        function pauseGame() {
+            game.isPaused = true;
+            clearInterval(game.shuffleInt);
+            document.getElementById('pauseOverlay').classList.add('active');
+        }
+
+        function resumeGame() {
+            game.isPaused = false;
+            document.getElementById('pauseOverlay').classList.remove('active');
+            // Restart shuffle if in shuffle phase
+            if (game.emojis.length > 0 && game.currentPhase === null) {
+                game.shuffleInt = setInterval(() => {
+                    shufflePositions();
+                }, 400);
+            }
+        }
+
+        function updateScore() {
+            const clarity = document.querySelector('input[name="clarity"]:checked');
+            const reasons = document.querySelector('input[name="reasons"]:checked');
+            const vocabulary = document.querySelector('input[name="vocabulary"]:checked');
+
+            if (clarity && reasons && vocabulary) {
+                const total = parseInt(clarity.value) + parseInt(reasons.value) + parseInt(vocabulary.value);
+                let level = 'OK 🤔';
+                if (total >= 5) level = 'EXCELLENT 🔥';
+                else if (total >= 3) level = 'GOOD 👍';
+
+                document.getElementById('scoreTotal').textContent = `TOTAL: ${total} points = ${level}`;
+                document.getElementById('submitScoreBtn').disabled = false;
+            }
+        }
+
+        function submitScore() {
+            const clarity = parseInt(document.querySelector('input[name="clarity"]:checked').value);
+            const reasons = parseInt(document.querySelector('input[name="reasons"]:checked').value);
+            const vocabulary = parseInt(document.querySelector('input[name="vocabulary"]:checked').value);
+            const total = clarity + reasons + vocabulary;
+
+            score(total);
         }
 
         function score(pts) {
@@ -1135,17 +1447,19 @@
             game[`p${scorer}`].score += pts;
             game.round++;
 
-            document.querySelectorAll('.score-button').forEach(b => b.disabled = true);
-
             if (game.round >= 10) {
                 setTimeout(() => endGame(), 1500);
             } else {
                 game.currentPlayer = game.currentPlayer === 1 ? 2 : 1;
+                game.currentPhase = null;
                 setTimeout(() => {
                     document.getElementById('shuffleContainer').style.display = 'grid';
                     document.getElementById('activateBtn').style.display = 'block';
                     document.getElementById('activateBtn').disabled = false;
+                    document.getElementById('scoringSection').style.display = 'none';
                     document.getElementById('questionDiv').style.display = 'none';
+                    document.querySelector('.vocab-box').style.opacity = '1';
+                    document.querySelector('.sentence-frames').style.opacity = '1';
                     updateUI();
                     startShuffle();
                 }, 1500);
@@ -1191,6 +1505,7 @@
             clearInterval(game.timerInt);
             clearInterval(game.shuffleInt);
             document.getElementById('shuffleContainer').innerHTML = '<div class="center-spotlight"></div>';
+            document.getElementById('pauseOverlay').classList.remove('active');
 
             game = {
                 p1: { name: '', score: 0 },
@@ -1200,13 +1515,16 @@
                 round: 0,
                 timerInt: null,
                 shuffleInt: null,
-                emojis: []
+                emojis: [],
+                difficulty: 'medium',
+                currentPhase: null,
+                isPaused: false
             };
 
             document.getElementById('p1Name').value = '';
             document.getElementById('p2Name').value = '';
             updateStartBtn();
-            showScreen('welcomeScreen');
+            showScreen('introScreen1');
         }
     </script>
 </body>
