@@ -622,53 +622,80 @@
             <div id="scoringSection" style="display: none; background: #002855; border: 3px solid #ffd700; padding: 30px; margin: 20px 40px; text-align: left;">
                 <h3 style="font-size: 16px; color: #ffd700; margin-bottom: 25px; text-align: center;">SCORE YOUR PARTNER / CALIFICA A TU COMPAÑERO</h3>
 
+                <!-- Question 1: Clarity -->
                 <div style="margin: 20px 0;">
-                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 10px; font-weight: bold;">Did they speak clearly? / ¿Hablaron claramente?</div>
-                    <div class="rubric-options">
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="clarity" value="0" style="margin-right: 10px;"> Hard to understand / Difícil de entender (0)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="clarity" value="1" style="margin-right: 10px;"> Mostly clear / Mayormente claro (1)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="clarity" value="2" style="margin-right: 10px;"> Very clear / Muy claro (2)
-                        </label>
+                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 12px; font-weight: bold; text-align: center;">
+                        🗣️ Did they speak clearly? / ¿Hablaron claramente?
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <button class="score-option-btn" data-category="clarity" data-value="0" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">😕</div>
+                            <div style="font-weight: bold;">0</div>
+                            <div style="font-size: 9px; color: #87ceeb;">Hard to understand<br>Difícil de entender</div>
+                        </button>
+                        <button class="score-option-btn" data-category="clarity" data-value="1" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">🙂</div>
+                            <div style="font-weight: bold;">1</div>
+                            <div style="font-size: 9px; color: #87ceeb;">Mostly clear<br>Mayormente claro</div>
+                        </button>
+                        <button class="score-option-btn" data-category="clarity" data-value="2" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">😊</div>
+                            <div style="font-weight: bold;">2</div>
+                            <div style="font-size: 9px; color: #87ceeb;">Very clear<br>Muy claro</div>
+                        </button>
                     </div>
                 </div>
 
+                <!-- Question 2: Reasons -->
                 <div style="margin: 20px 0;">
-                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 10px; font-weight: bold;">Did they give reasons? / ¿Dieron razones?</div>
-                    <div class="rubric-options">
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="reasons" value="0" style="margin-right: 10px;"> No reasons / Sin razones (0)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="reasons" value="1" style="margin-right: 10px;"> One reason / Una razón (1)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="reasons" value="2" style="margin-right: 10px;"> Two or more / Dos o más (2)
-                        </label>
+                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 12px; font-weight: bold; text-align: center;">
+                        💡 Did they give reasons? / ¿Dieron razones?
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <button class="score-option-btn" data-category="reasons" data-value="0" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">❌</div>
+                            <div style="font-weight: bold;">0</div>
+                            <div style="font-size: 9px; color: #87ceeb;">No reasons<br>Sin razones</div>
+                        </button>
+                        <button class="score-option-btn" data-category="reasons" data-value="1" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">💭</div>
+                            <div style="font-weight: bold;">1</div>
+                            <div style="font-size: 9px; color: #87ceeb;">One reason<br>Una razón</div>
+                        </button>
+                        <button class="score-option-btn" data-category="reasons" data-value="2" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">💬</div>
+                            <div style="font-weight: bold;">2</div>
+                            <div style="font-size: 9px; color: #87ceeb;">Two or more<br>Dos o más</div>
+                        </button>
                     </div>
                 </div>
 
+                <!-- Question 3: Vocabulary -->
                 <div style="margin: 20px 0;">
-                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 10px; font-weight: bold;">Did they use new words? / ¿Usaron palabras nuevas?</div>
-                    <div class="rubric-options">
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="vocabulary" value="0" style="margin-right: 10px;"> No new words / Sin palabras nuevas (0)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="vocabulary" value="1" style="margin-right: 10px;"> 1-2 new words / 1-2 palabras (1)
-                        </label>
-                        <label style="display: block; margin: 8px 0; font-size: 12px; color: #ffd700; cursor: pointer;">
-                            <input type="radio" name="vocabulary" value="2" style="margin-right: 10px;"> 3+ new words / 3+ palabras (2)
-                        </label>
+                    <div style="font-size: 13px; color: #ffeb3b; margin-bottom: 12px; font-weight: bold; text-align: center;">
+                        📚 Did they use new words? / ¿Usaron palabras nuevas?
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <button class="score-option-btn" data-category="vocabulary" data-value="0" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">📖</div>
+                            <div style="font-weight: bold;">0</div>
+                            <div style="font-size: 9px; color: #87ceeb;">No new words<br>Sin palabras nuevas</div>
+                        </button>
+                        <button class="score-option-btn" data-category="vocabulary" data-value="1" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">📗</div>
+                            <div style="font-weight: bold;">1</div>
+                            <div style="font-size: 9px; color: #87ceeb;">1-2 new words<br>1-2 palabras</div>
+                        </button>
+                        <button class="score-option-btn" data-category="vocabulary" data-value="2" style="padding: 15px; background: #003366; border: 3px solid #666; color: #ffd700; font-size: 11px; cursor: pointer; text-align: center; line-height: 1.4;">
+                            <div style="font-size: 20px; margin-bottom: 5px;">📚</div>
+                            <div style="font-weight: bold;">2</div>
+                            <div style="font-size: 9px; color: #87ceeb;">3+ new words<br>3+ palabras</div>
+                        </button>
                     </div>
                 </div>
 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 3px solid #ffd700; text-align: center;">
-                    <div id="scoreTotal" style="font-size: 18px; color: #ffeb3b; margin-bottom: 20px; font-weight: bold;">Select all options to see score</div>
+                    <div id="scoreTotal" style="font-size: 18px; color: #ffeb3b; margin-bottom: 20px; font-weight: bold;">Click buttons above to score / Haz clic arriba</div>
                     <button id="submitScoreBtn" style="width: 80%; font-size: 16px; padding: 20px;" disabled>NEXT ROUND / SIGUIENTE →</button>
                 </div>
             </div>
@@ -1187,9 +1214,28 @@
             }
         });
 
-        // Rubric scoring
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', updateScore);
+        // Rubric scoring - button-based system
+        document.querySelectorAll('.score-option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const category = this.dataset.category;
+                const value = this.dataset.value;
+
+                // Remove selection from other buttons in same category
+                document.querySelectorAll(`.score-option-btn[data-category="${category}"]`).forEach(b => {
+                    b.style.border = '3px solid #666';
+                    b.style.background = '#003366';
+                });
+
+                // Highlight selected button
+                this.style.border = '3px solid #ffd700';
+                this.style.background = '#004080';
+
+                // Store selection
+                game.scores = game.scores || {};
+                game.scores[category] = parseInt(value);
+
+                updateScore();
+            });
         });
 
         document.getElementById('submitScoreBtn').addEventListener('click', submitScore);
@@ -1416,9 +1462,13 @@
             document.getElementById('questionDiv').style.display = 'none';
             document.getElementById('scoringSection').style.display = 'block';
 
-            // Reset radio buttons
-            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-            document.getElementById('scoreTotal').textContent = 'Select all options to see score';
+            // Reset score buttons
+            game.scores = {};
+            document.querySelectorAll('.score-option-btn').forEach(btn => {
+                btn.style.border = '3px solid #666';
+                btn.style.background = '#003366';
+            });
+            document.getElementById('scoreTotal').textContent = 'Click buttons above to score / Haz clic arriba';
             document.getElementById('submitScoreBtn').disabled = true;
         }
 
@@ -1466,27 +1516,27 @@
         }
 
         function updateScore() {
-            const clarity = document.querySelector('input[name="clarity"]:checked');
-            const reasons = document.querySelector('input[name="reasons"]:checked');
-            const vocabulary = document.querySelector('input[name="vocabulary"]:checked');
+            const scores = game.scores || {};
 
-            if (clarity && reasons && vocabulary) {
-                const total = parseInt(clarity.value) + parseInt(reasons.value) + parseInt(vocabulary.value);
+            if (scores.clarity !== undefined && scores.reasons !== undefined && scores.vocabulary !== undefined) {
+                const total = scores.clarity + scores.reasons + scores.vocabulary;
                 let level = 'OK 🤔';
-                if (total >= 5) level = 'EXCELLENT 🔥';
-                else if (total >= 3) level = 'GOOD 👍';
+                let levelSpanish = 'Está bien';
+                if (total >= 5) {
+                    level = 'EXCELLENT 🔥';
+                    levelSpanish = 'Excelente';
+                } else if (total >= 3) {
+                    level = 'GOOD 👍';
+                    levelSpanish = 'Bien';
+                }
 
-                document.getElementById('scoreTotal').textContent = `TOTAL: ${total} points = ${level}`;
+                document.getElementById('scoreTotal').textContent = `TOTAL: ${total} points = ${level} / ${levelSpanish}`;
                 document.getElementById('submitScoreBtn').disabled = false;
             }
         }
 
         function submitScore() {
-            const clarity = parseInt(document.querySelector('input[name="clarity"]:checked').value);
-            const reasons = parseInt(document.querySelector('input[name="reasons"]:checked').value);
-            const vocabulary = parseInt(document.querySelector('input[name="vocabulary"]:checked').value);
-            const total = clarity + reasons + vocabulary;
-
+            const total = game.scores.clarity + game.scores.reasons + game.scores.vocabulary;
             score(total);
         }
 
