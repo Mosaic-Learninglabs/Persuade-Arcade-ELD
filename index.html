@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERSUADE ARCADE - ELD Beginners</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #001f3f;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffd700;
+        }
+
+        .game-container {
+            width: 95%;
+            max-width: 1000px;
+            max-height: 90vh;
+            background: #003366;
+            border: 8px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.3);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            min-height: 650px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .game-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #ffeb3b;
+            margin-bottom: 10px;
+        }
+
+        .translation {
+            font-size: 12px;
+            color: #87ceeb;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #ffd700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group .label-translation {
+            font-size: 10px;
+            color: #87ceeb;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', cursive;
+            border: 3px solid #ffd700;
+            background: #001f3f;
+            color: #ffd700;
+            width: 250px;
+        }
+
+        button {
+            padding: 14px 30px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', cursive;
+            background: #ffd700;
+            color: #001f3f;
+            border: 4px solid #ffd700;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        button:hover:not(:disabled) {
+            background: #ffeb3b;
+            border-color: #ffeb3b;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #001f3f;
+            border: 4px solid #ffd700;
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .player-score {
+            padding: 8px 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+        }
+
+        .player-score.active {
+            background: rgba(255, 235, 59, 0.4);
+            border-color: #ffeb3b;
+            color: #ffeb3b;
+        }
+
+        .shuffle-container {
+            width: 100%;
+            height: 300px;
+            background: #001f3f;
+            border: 4px solid #ffd700;
+            margin: 20px 0;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .shuffle-emoji {
+            font-size: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            user-select: none;
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .shuffle-emoji.shuffling {
+            animation: pulse 0.3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .center-spotlight {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border: 4px solid #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.3);
+            pointer-events: none;
+            z-index: 5;
+            animation: spotlight-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spotlight-pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9), inset 0 0 50px rgba(255, 215, 0, 0.5); }
+        }
+
+        .shuffle-emoji.in-spotlight {
+            z-index: 10;
+            opacity: 1;
+        }
+
+        .shuffle-emoji.frozen {
+            animation: none !important;
+        }
+
+        .shuffle-emoji.fading {
+            opacity: 0 !important;
+            transform: scale(0.5) !important;
+            transition: all 0.5s ease;
+        }
+
+        .shuffle-emoji.winner {
+            animation: winner-grow 1s ease forwards !important;
+            z-index: 100;
+        }
+
+        @keyframes winner-grow {
+            0% { transform: scale(1); }
+            50% { transform: scale(2); }
+            100% { transform: scale(2.5); }
+        }
+
+        .spin-button {
+            display: block;
+            margin: 0 auto 20px;
+            background: #ffd700;
+            color: #001f3f;
+            border: 4px solid #ffd700;
+            font-size: 18px;
+            padding: 18px 40px;
+        }
+
+        .spin-button:hover:not(:disabled) {
+            background: #ffeb3b;
+            color: #001f3f;
+            transform: scale(1.1);
+        }
+
+        .turn-indicator {
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .question-container {
+            display: none;
+            background: #001f3f;
+            border: 4px solid #ffd700;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .question-text {
+            font-size: 14px;
+            color: #ffd700;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .question-translation {
+            font-size: 12px;
+            color: #87ceeb;
+            margin: 10px 0;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .sentence-frames {
+            background: #002855;
+            border: 2px solid #87ceeb;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .sentence-frames h4 {
+            font-size: 12px;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .sentence-frames h4 .spanish {
+            color: #87ceeb;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .frame-option {
+            font-size: 11px;
+            color: #ffeb3b;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .frame-spanish {
+            font-size: 10px;
+            color: #87ceeb;
+            margin-left: 10px;
+            font-style: italic;
+        }
+
+        .vocab-box {
+            background: #002855;
+            border: 2px solid #ffd700;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .vocab-box h4 {
+            font-size: 11px;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .vocab-item {
+            font-size: 10px;
+            color: #ffeb3b;
+            margin: 5px 0;
+        }
+
+        .vocab-translation {
+            color: #87ceeb;
+            margin-left: 8px;
+        }
+
+        .timer-bar {
+            height: 30px;
+            background: #001f3f;
+            border: 2px solid #ffd700;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffeb3b);
+            transition: width 1s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #001f3f;
+            font-weight: bold;
+        }
+
+        .timer-fill.warning {
+            background: linear-gradient(90deg, #ffa500, #ff8c00);
+        }
+
+        .timer-fill.danger {
+            background: linear-gradient(90deg, #ff4500, #dc143c);
+        }
+
+        .scoring-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .score-button {
+            padding: 15px 10px;
+            border: 3px solid #ffd700;
+            background: #001f3f;
+            color: #ffd700;
+            font-size: 10px;
+            margin: 0;
+        }
+
+        .score-button:hover:not(:disabled) {
+            background: #ffd700;
+            color: #001f3f;
+        }
+
+        .score-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .emoji-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .score-spanish {
+            font-size: 9px;
+            color: #87ceeb;
+            margin-top: 3px;
+        }
+
+        .final-scores {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+
+        .final-card {
+            padding: 20px;
+            background: #001f3f;
+            border: 4px solid #ffd700;
+            min-width: 150px;
+        }
+
+        .final-card.winner {
+            border-color: #ffeb3b;
+            border-width: 6px;
+            box-shadow: 0 0 30px #ffeb3b;
+        }
+
+        .final-card h3 {
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .final-card.winner h3 {
+            color: #ffeb3b;
+        }
+
+        .final-card .score {
+            font-size: 32px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .final-card.winner .score {
+            color: #ffeb3b;
+        }
+
+        .winner-text {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcomeScreen">
+            <h1 class="game-title">PERSUADE</h1>
+            <p class="subtitle">~ SPEAKING GAME ~</p>
+            <p class="translation">~ JUEGO DE HABLAR ~</p>
+
+            <div class="input-group">
+                <label>PLAYER 1 NAME</label>
+                <span class="label-translation">Nombre del Jugador 1</span>
+                <input type="text" id="p1Name" placeholder="Enter name" maxlength="15">
+            </div>
+            <div class="input-group">
+                <label>PLAYER 2 NAME</label>
+                <span class="label-translation">Nombre del Jugador 2</span>
+                <input type="text" id="p2Name" placeholder="Enter name" maxlength="15">
+            </div>
+
+            <button id="startBtn" disabled>START / EMPEZAR</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen" id="gameScreen">
+            <div class="score-header">
+                <div class="player-score" id="p1Score">P1: 0</div>
+                <div class="player-score" id="p2Score">P2: 0</div>
+            </div>
+
+            <div class="turn-indicator" id="turnText"></div>
+            <div class="shuffle-container" id="shuffleContainer">
+                <div class="center-spotlight"></div>
+            </div>
+            <button class="spin-button" id="activateBtn">FREEZE! / ¡CONGELA!</button>
+
+            <div class="question-container" id="questionDiv">
+                <div class="question-text" id="questionText"></div>
+                <div class="question-translation" id="questionTranslation"></div>
+
+                <div class="vocab-box">
+                    <h4>💡 USEFUL WORDS / PALABRAS ÚTILES</h4>
+                    <div id="vocabList"></div>
+                </div>
+
+                <div class="sentence-frames">
+                    <h4>📝 SENTENCE STARTERS <span class="spanish">Frases para Empezar</span></h4>
+                    <div id="framesList"></div>
+                </div>
+
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill">120s</div>
+                </div>
+
+                <div class="scoring-container">
+                    <button class="score-button" data-score="3">
+                        <div class="emoji-icon">🔥</div>
+                        <div>EXCELLENT</div>
+                        <div class="score-spanish">Excelente</div>
+                        <div>+3</div>
+                    </button>
+                    <button class="score-button" data-score="2">
+                        <div class="emoji-icon">👍</div>
+                        <div>GOOD</div>
+                        <div class="score-spanish">Bien</div>
+                        <div>+2</div>
+                    </button>
+                    <button class="score-button" data-score="1">
+                        <div class="emoji-icon">🤔</div>
+                        <div>OK</div>
+                        <div class="score-spanish">Está bien</div>
+                        <div>+1</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div class="screen" id="endScreen">
+            <h1 class="game-title">GAME OVER</h1>
+            <p class="translation">FIN DEL JUEGO</p>
+            <div class="final-scores" id="finalScores"></div>
+            <div class="winner-text" id="winnerText"></div>
+            <button id="playAgainBtn">PLAY AGAIN / JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script>
+        const scenarios = [
+            {
+                id: 1,
+                emoji: '🍕',
+                text: 'Your friend has chips but says NO. Convince them to share with you!',
+                translation: 'Tu amigo tiene papas pero dice NO. ¡Convéncelo de compartir contigo!',
+                vocab: [
+                    'share = compartir',
+                    'hungry = tengo hambre',
+                    'tomorrow = mañana',
+                    'friend = amigo'
+                ],
+                frames: [
+                    'Please! I am very hungry. = ¡Por favor! Tengo mucha hambre.',
+                    'I will share tomorrow. = Compartiré mañana.',
+                    'You are a good friend. = Eres un buen amigo.'
+                ]
+            },
+            {
+                id: 2,
+                emoji: '⚽',
+                text: 'Your friend wants to sit inside. Convince them to play soccer at lunch!',
+                translation: 'Tu amigo quiere sentarse adentro. ¡Convéncelo de jugar fútbol en el almuerzo!',
+                vocab: [
+                    'play = jugar',
+                    'fun = divertido',
+                    'need = necesitamos',
+                    'team = equipo'
+                ],
+                frames: [
+                    'We need one more player! = ¡Necesitamos un jugador más!',
+                    'It is very fun! = ¡Es muy divertido!',
+                    'You are good at soccer. = Eres bueno en fútbol.'
+                ]
+            },
+            {
+                id: 3,
+                emoji: '✏️',
+                text: 'Your friend says NO pencils. You have a test! Convince them to help you.',
+                translation: 'Tu amigo dice NO lápices. ¡Tienes un examen! Convéncelo de ayudarte.',
+                vocab: [
+                    'test = examen',
+                    'need = necesito',
+                    'help = ayudar',
+                    'careful = cuidadoso'
+                ],
+                frames: [
+                    'I have a test now! = ¡Tengo un examen ahora!',
+                    'Please help me. = Por favor ayúdame.',
+                    'I will be very careful. = Tendré mucho cuidado.'
+                ]
+            },
+            {
+                id: 4,
+                emoji: '🎮',
+                text: 'The teacher says NO games. You finished all your work early. Convince the teacher!',
+                translation: 'El maestro dice NO juegos. Terminaste todo tu trabajo temprano. ¡Convence al maestro!',
+                vocab: [
+                    'finished = terminé',
+                    'all = todo',
+                    'early = temprano',
+                    'quiet = callado'
+                ],
+                frames: [
+                    'I finished all my work. = Terminé todo mi trabajo.',
+                    'I finished early! = ¡Terminé temprano!',
+                    'I will be very quiet. = Estaré muy callado.'
+                ]
+            },
+            {
+                id: 5,
+                emoji: '🪑',
+                text: 'Someone took your seat and says NO. Convince them you need this seat!',
+                translation: 'Alguien tomó tu asiento y dice NO. ¡Convéncelo de que necesitas este asiento!',
+                vocab: [
+                    'seat = asiento',
+                    'my = mi/mío',
+                    'always = siempre',
+                    'see = ver'
+                ],
+                frames: [
+                    'This is my seat. = Este es mi asiento.',
+                    'I sit here every day. = Me siento aquí cada día.',
+                    'I cannot see from there. = No puedo ver desde allá.'
+                ]
+            },
+            {
+                id: 6,
+                emoji: '👥',
+                text: 'The teacher says work alone. Convince the teacher you work better with a partner!',
+                translation: 'El maestro dice trabajar solo. ¡Convence al maestro de que trabajas mejor con un compañero!',
+                vocab: [
+                    'better = mejor',
+                    'together = juntos',
+                    'help = ayudar',
+                    'learn = aprender'
+                ],
+                frames: [
+                    'We work better together. = Trabajamos mejor juntos.',
+                    'We help each other. = Nos ayudamos.',
+                    'We learn more this way. = Aprendemos más así.'
+                ]
+            },
+            {
+                id: 7,
+                emoji: '🚽',
+                text: 'The teacher says wait until lunch. You REALLY need to go! Convince the teacher NOW.',
+                translation: 'El maestro dice esperar hasta el almuerzo. ¡REALMENTE necesitas ir! Convence al maestro AHORA.',
+                vocab: [
+                    'emergency = emergencia',
+                    'cannot wait = no puedo esperar',
+                    'sick = enfermo',
+                    'fast = rápido'
+                ],
+                frames: [
+                    'This is an emergency! = ¡Esto es una emergencia!',
+                    'I cannot wait. = No puedo esperar.',
+                    'I will be very fast. = Seré muy rápido.'
+                ]
+            },
+            {
+                id: 8,
+                emoji: '📱',
+                text: 'The teacher says NO phone. Your mom is picking you up early! Convince the teacher.',
+                translation: 'El maestro dice NO teléfono. ¡Tu mamá te recogerá temprano! Convence al maestro.',
+                vocab: [
+                    'important = importante',
+                    'mom = mamá',
+                    'pick up = recoger',
+                    'message = mensaje'
+                ],
+                frames: [
+                    'This is very important! = ¡Esto es muy importante!',
+                    'My mom is picking me up. = Mi mamá me va a recoger.',
+                    'I need to send a message. = Necesito mandar un mensaje.'
+                ]
+            },
+            {
+                id: 9,
+                emoji: '🎧',
+                text: 'The teacher says NO music in class. Convince the teacher music helps you work!',
+                translation: 'El maestro dice NO música en clase. ¡Convence al maestro de que la música te ayuda a trabajar!',
+                vocab: [
+                    'focus = concentrar',
+                    'better = mejor',
+                    'quiet = silenciosa',
+                    'noise = ruido'
+                ],
+                frames: [
+                    'Music helps me focus. = La música me ayuda a concentrarme.',
+                    'I work better with music. = Trabajo mejor con música.',
+                    'I will use quiet music. = Usaré música silenciosa.'
+                ]
+            },
+            {
+                id: 10,
+                emoji: '🏃',
+                text: 'The teacher wants gym class inside. The weather is perfect! Convince the teacher to go outside.',
+                translation: 'El maestro quiere clase de gimnasia adentro. ¡El clima está perfecto! Convence al maestro de ir afuera.',
+                vocab: [
+                    'weather = clima',
+                    'perfect = perfecto',
+                    'healthy = saludable',
+                    'sun = sol'
+                ],
+                frames: [
+                    'The weather is perfect! = ¡El clima está perfecto!',
+                    'We need sun and fresh air. = Necesitamos sol y aire fresco.',
+                    'It is more healthy outside. = Es más saludable afuera.'
+                ]
+            },
+            {
+                id: 11,
+                emoji: '🍕',
+                text: 'Your mom made dinner but you want pizza! Convince your mom to order pizza tonight.',
+                translation: '¡Tu mamá hizo cena pero tú quieres pizza! Convence a tu mamá de ordenar pizza esta noche.',
+                vocab: [
+                    'tired = cansada',
+                    'cooked = cocinó',
+                    'special = especial',
+                    'favorite = favorito'
+                ],
+                frames: [
+                    'You are tired. You cooked yesterday. = Estás cansada. Cocinaste ayer.',
+                    'Today is special! = ¡Hoy es especial!',
+                    'Pizza is my favorite. = Pizza es mi favorito.'
+                ]
+            },
+            {
+                id: 12,
+                emoji: '🎮',
+                text: 'Your friend wants to play a different game. Convince them to play YOUR game!',
+                translation: 'Tu amigo quiere jugar un juego diferente. ¡Convéncelo de jugar TU juego!',
+                vocab: [
+                    'better = mejor',
+                    'try = probar/intentar',
+                    'new = nuevo',
+                    'cool = genial'
+                ],
+                frames: [
+                    'My game is better! = ¡Mi juego es mejor!',
+                    'Please try it. = Por favor inténtalo.',
+                    'It is very cool! = ¡Es muy genial!'
+                ]
+            },
+            {
+                id: 13,
+                emoji: '😴',
+                text: 'Your parent says go to bed. You are not tired! Convince them you can stay up 30 more minutes.',
+                translation: 'Tu padre/madre dice ir a dormir. ¡No estás cansado! Convéncelos de que puedes quedarte despierto 30 minutos más.',
+                vocab: [
+                    'tired = cansado',
+                    'homework = tarea',
+                    'almost done = casi terminado',
+                    'tomorrow = mañana'
+                ],
+                frames: [
+                    'I am not tired! = ¡No estoy cansado!',
+                    'I am almost done with homework. = Casi termino con la tarea.',
+                    'Only 30 more minutes! = ¡Solo 30 minutos más!'
+                ]
+            },
+            {
+                id: 14,
+                emoji: '🎂',
+                text: 'Your friend forgot your birthday! Convince them to celebrate with you this weekend.',
+                translation: '¡Tu amigo olvidó tu cumpleaños! Convéncelo de celebrar contigo este fin de semana.',
+                vocab: [
+                    'birthday = cumpleaños',
+                    'forgot = olvidó',
+                    'celebrate = celebrar',
+                    'important = importante'
+                ],
+                frames: [
+                    'You forgot my birthday! = ¡Olvidaste mi cumpleaños!',
+                    'It is important to me. = Es importante para mí.',
+                    'Let\'s celebrate this weekend! = ¡Vamos a celebrar este fin de semana!'
+                ]
+            },
+            {
+                id: 15,
+                emoji: '📺',
+                text: 'Your sibling has the remote. They are watching a baby show! Convince them to change it.',
+                translation: 'Tu hermano/hermana tiene el control. ¡Están viendo un programa para bebés! Convéncelos de cambiarlo.',
+                vocab: [
+                    'change = cambiar',
+                    'boring = aburrido',
+                    'turn = turno',
+                    'baby show = programa para bebés'
+                ],
+                frames: [
+                    'This show is for babies! = ¡Este programa es para bebés!',
+                    'It is very boring! = ¡Es muy aburrido!',
+                    'It is my turn now. = Es mi turno ahora.'
+                ]
+            },
+            {
+                id: 16,
+                emoji: '🏀',
+                text: 'You are losing in basketball. Your team wants to quit! Convince them to keep playing.',
+                translation: 'Están perdiendo en baloncesto. ¡Tu equipo quiere rendirse! Convéncelos de seguir jugando.',
+                vocab: [
+                    'quit = rendirse',
+                    'win = ganar',
+                    'still time = todavía hay tiempo',
+                    'try = intentar'
+                ],
+                frames: [
+                    'Don\'t quit! = ¡No se rindan!',
+                    'We can still win! = ¡Todavía podemos ganar!',
+                    'We have time. Let\'s try! = Tenemos tiempo. ¡Vamos a intentar!'
+                ]
+            },
+            {
+                id: 17,
+                emoji: '🍟',
+                text: 'Your parent says no fast food. You are SO hungry! Convince them to stop at a restaurant.',
+                translation: 'Tu padre/madre dice no comida rápida. ¡Tienes MUCHA hambre! Convéncelos de parar en un restaurante.',
+                vocab: [
+                    'hungry = hambriento',
+                    'starving = muriendo de hambre',
+                    'quick = rápido',
+                    'please = por favor'
+                ],
+                frames: [
+                    'I am starving! = ¡Me muero de hambre!',
+                    'We can be quick! = ¡Podemos ser rápidos!',
+                    'Please! Just this time! = ¡Por favor! ¡Solo esta vez!'
+                ]
+            },
+            {
+                id: 18,
+                emoji: '🐕',
+                text: 'Your parent says dogs are too much work. Convince them you can take care of a dog!',
+                translation: 'Tu padre/madre dice que los perros son mucho trabajo. ¡Convéncelos de que puedes cuidar un perro!',
+                vocab: [
+                    'responsible = responsable',
+                    'take care = cuidar',
+                    'walk = caminar/pasear',
+                    'promise = prometo'
+                ],
+                frames: [
+                    'I am responsible! = ¡Soy responsable!',
+                    'I will walk it every day. = Lo pasearé cada día.',
+                    'I promise to take care of it! = ¡Prometo cuidarlo!'
+                ]
+            },
+            {
+                id: 19,
+                emoji: '🎒',
+                text: 'Group project! Nobody wants to work with the new kid. Convince your group to include them.',
+                translation: '¡Proyecto en grupo! Nadie quiere trabajar con el chico nuevo. Convence a tu grupo de incluirlo.',
+                vocab: [
+                    'new = nuevo',
+                    'nice = amable',
+                    'smart = inteligente',
+                    'give a chance = dar una oportunidad'
+                ],
+                frames: [
+                    'The new kid is nice! = ¡El chico nuevo es amable!',
+                    'We should give a chance. = Debemos dar una oportunidad.',
+                    'Everyone deserves friends. = Todos merecen amigos.'
+                ]
+            },
+            {
+                id: 20,
+                emoji: '💰',
+                text: 'Your friend owes you $5 but says "tomorrow." You need it NOW! Convince them to pay you today.',
+                translation: 'Tu amigo te debe $5 pero dice "mañana." ¡Lo necesitas AHORA! Convéncelo de pagarte hoy.',
+                vocab: [
+                    'owe = deber',
+                    'promise = prometer/promesa',
+                    'forgot = olvidó',
+                    'need = necesitar'
+                ],
+                frames: [
+                    'You promised! = ¡Prometiste!',
+                    'I need it today! = ¡Lo necesito hoy!',
+                    'You always say tomorrow! = ¡Siempre dices mañana!'
+                ]
+            },
+            {
+                id: 21,
+                emoji: '🎧',
+                text: 'Your friend took your headphones without asking! Convince them that is not okay.',
+                translation: '¡Tu amigo tomó tus audífonos sin pedir! Convéncelo de que eso no está bien.',
+                vocab: [
+                    'mine = mío',
+                    'ask = preguntar/pedir',
+                    'respect = respetar',
+                    'permission = permiso'
+                ],
+                frames: [
+                    'Those are mine! = ¡Esos son míos!',
+                    'You need to ask first! = ¡Necesitas preguntar primero!',
+                    'You need to respect my things. = Necesitas respetar mis cosas.'
+                ]
+            },
+            {
+                id: 22,
+                emoji: '🏠',
+                text: 'Your friend can come over but only for 1 hour. Convince your parent to let them stay longer!',
+                translation: 'Tu amigo puede venir pero solo por 1 hora. ¡Convence a tu padre/madre de dejarlo quedarse más tiempo!',
+                vocab: [
+                    'longer = más tiempo',
+                    'fun = divertido',
+                    'rarely = rara vez',
+                    'weekend = fin de semana'
+                ],
+                frames: [
+                    'One hour is too short! = ¡Una hora es muy corta!',
+                    'We rarely see each other! = ¡Rara vez nos vemos!',
+                    'It is the weekend! = ¡Es el fin de semana!'
+                ]
+            },
+            {
+                id: 23,
+                emoji: '🎨',
+                text: 'Art class! Everyone wants to paint. Convince the class to do a group mural instead!',
+                translation: '¡Clase de arte! Todos quieren pintar. ¡Convence a la clase de hacer un mural en grupo!',
+                vocab: [
+                    'together = juntos',
+                    'bigger = más grande',
+                    'amazing = increíble',
+                    'teamwork = trabajo en equipo'
+                ],
+                frames: [
+                    'A mural is bigger and better! = ¡Un mural es más grande y mejor!',
+                    'We can work together! = ¡Podemos trabajar juntos!',
+                    'It will be amazing! = ¡Será increíble!'
+                ]
+            },
+            {
+                id: 24,
+                emoji: '🚗',
+                text: 'Your parent says walk home. It is raining! Convince them to pick you up from school.',
+                translation: 'Tu padre/madre dice caminar a casa. ¡Está lloviendo! Convéncelos de recogerte de la escuela.',
+                vocab: [
+                    'raining = lloviendo',
+                    'wet = mojado',
+                    'sick = enfermo',
+                    'cold = frío'
+                ],
+                frames: [
+                    'It is raining! = ¡Está lloviendo!',
+                    'I will get very wet and cold! = ¡Me mojaré y tendré mucho frío!',
+                    'I can get sick! = ¡Puedo enfermarme!'
+                ]
+            },
+            {
+                id: 25,
+                emoji: '🎉',
+                text: 'There is a school dance but your parent says no. Convince them to let you go!',
+                translation: 'Hay un baile escolar pero tu padre/madre dice no. ¡Convéncelos de dejarte ir!',
+                vocab: [
+                    'dance = baile',
+                    'everyone = todos',
+                    'safe = seguro',
+                    'miss out = perder'
+                ],
+                frames: [
+                    'Everyone is going! = ¡Todos van!',
+                    'It is at school. It is safe! = Es en la escuela. ¡Es seguro!',
+                    'I will miss out! = ¡Me lo perderé!'
+                ]
+            }
+        ];
+
+        let game = {
+            p1: { name: '', score: 0 },
+            p2: { name: '', score: 0 },
+            currentPlayer: 1,
+            remaining: [...scenarios],
+            round: 0,
+            timerInt: null,
+            shuffleInt: null,
+            emojis: []
+        };
+
+        // Setup
+        document.getElementById('p1Name').addEventListener('input', updateStartBtn);
+        document.getElementById('p2Name').addEventListener('input', updateStartBtn);
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('activateBtn').addEventListener('click', freezeShuffle);
+        document.getElementById('playAgainBtn').addEventListener('click', reset);
+
+        document.querySelectorAll('.score-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pts = parseInt(btn.dataset.score);
+                score(pts);
+            });
+        });
+
+        function updateStartBtn() {
+            const p1 = document.getElementById('p1Name').value.trim();
+            const p2 = document.getElementById('p2Name').value.trim();
+            document.getElementById('startBtn').disabled = !(p1 && p2);
+        }
+
+        function startGame() {
+            game.p1.name = document.getElementById('p1Name').value.trim();
+            game.p2.name = document.getElementById('p2Name').value.trim();
+            game.remaining = [...scenarios].sort(() => Math.random() - 0.5);
+
+            showScreen('gameScreen');
+            updateUI();
+            startShuffle();
+        }
+
+        function startShuffle() {
+            const container = document.getElementById('shuffleContainer');
+            // Clear any existing emojis
+            const emojis = container.querySelectorAll('.shuffle-emoji');
+            emojis.forEach(e => e.remove());
+            game.emojis = [];
+
+            // Create emoji elements for all remaining scenarios
+            game.remaining.forEach(scenario => {
+                const el = document.createElement('div');
+                el.className = 'shuffle-emoji shuffling';
+                el.textContent = scenario.emoji;
+                el.dataset.id = scenario.id;
+                container.appendChild(el);
+                game.emojis.push({element: el, scenario: scenario});
+            });
+
+            // Start shuffling positions
+            game.shuffleInt = setInterval(() => {
+                shufflePositions();
+            }, 400);
+        }
+
+        function shufflePositions() {
+            // Fisher-Yates shuffle of the emoji elements
+            const container = document.getElementById('shuffleContainer');
+            const elements = [...container.querySelectorAll('.shuffle-emoji')];
+
+            for (let i = elements.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                // Swap positions by swapping in DOM
+                if (i !== j) {
+                    const temp = elements[i].nextSibling;
+                    container.insertBefore(elements[i], elements[j]);
+                    container.insertBefore(elements[j], temp);
+                }
+            }
+        }
+
+        function freezeShuffle() {
+            document.getElementById('activateBtn').disabled = true;
+            clearInterval(game.shuffleInt);
+
+            // Stop animation
+            game.emojis.forEach(e => e.element.classList.remove('shuffling'));
+            game.emojis.forEach(e => e.element.classList.add('frozen'));
+
+            // Find which emoji is closest to center (in the spotlight)
+            const container = document.getElementById('shuffleContainer');
+            const containerRect = container.getBoundingClientRect();
+            const centerX = containerRect.left + containerRect.width / 2;
+            const centerY = containerRect.top + containerRect.height / 2;
+
+            let closest = null;
+            let minDist = Infinity;
+
+            game.emojis.forEach(item => {
+                const rect = item.element.getBoundingClientRect();
+                const emojiCenterX = rect.left + rect.width / 2;
+                const emojiCenterY = rect.top + rect.height / 2;
+                const dist = Math.sqrt(
+                    Math.pow(centerX - emojiCenterX, 2) +
+                    Math.pow(centerY - emojiCenterY, 2)
+                );
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = item;
+                }
+            });
+
+            // Animate selection
+            setTimeout(() => {
+                game.emojis.forEach(item => {
+                    if (item === closest) {
+                        item.element.classList.add('winner');
+                        item.element.classList.add('in-spotlight');
+                    } else {
+                        item.element.classList.add('fading');
+                    }
+                });
+
+                setTimeout(() => {
+                    showQuestion(closest.scenario);
+                    game.remaining = game.remaining.filter(x => x.id !== closest.scenario.id);
+                    container.innerHTML = '<div class="center-spotlight"></div>';
+                    game.emojis = [];
+                    container.style.display = 'none';
+                    document.getElementById('activateBtn').style.display = 'none';
+                    startTimer();
+                }, 1500);
+            }, 500);
+        }
+
+        function showQuestion(scenario) {
+            document.getElementById('questionText').textContent = scenario.text;
+            document.getElementById('questionTranslation').textContent = scenario.translation;
+
+            // Show vocabulary
+            const vocabHtml = scenario.vocab.map(v =>
+                `<div class="vocab-item">${v}</div>`
+            ).join('');
+            document.getElementById('vocabList').innerHTML = vocabHtml;
+
+            // Show sentence frames
+            const framesHtml = scenario.frames.map(f =>
+                `<div class="frame-option">${f}</div>`
+            ).join('');
+            document.getElementById('framesList').innerHTML = framesHtml;
+
+            document.getElementById('questionDiv').style.display = 'block';
+            document.querySelectorAll('.score-button').forEach(b => b.disabled = false);
+        }
+
+        function startTimer() {
+            let sec = 120; // Extended to 120 seconds for beginners
+            const fill = document.getElementById('timerFill');
+
+            game.timerInt = setInterval(() => {
+                sec--;
+                const pct = (sec / 120) * 100;
+                fill.style.width = pct + '%';
+                fill.textContent = sec + 's';
+
+                fill.className = 'timer-fill';
+                if (sec <= 40) fill.classList.add('warning');
+                if (sec <= 15) fill.classList.add('danger');
+
+                if (sec <= 0) {
+                    clearInterval(game.timerInt);
+                    score(1);
+                }
+            }, 1000);
+        }
+
+        function score(pts) {
+            clearInterval(game.timerInt);
+            const scorer = game.currentPlayer === 1 ? 2 : 1;
+            game[`p${scorer}`].score += pts;
+            game.round++;
+
+            document.querySelectorAll('.score-button').forEach(b => b.disabled = true);
+
+            if (game.round >= 10) {
+                setTimeout(() => endGame(), 1500);
+            } else {
+                game.currentPlayer = game.currentPlayer === 1 ? 2 : 1;
+                setTimeout(() => {
+                    document.getElementById('shuffleContainer').style.display = 'grid';
+                    document.getElementById('activateBtn').style.display = 'block';
+                    document.getElementById('activateBtn').disabled = false;
+                    document.getElementById('questionDiv').style.display = 'none';
+                    updateUI();
+                    startShuffle();
+                }, 1500);
+            }
+        }
+
+        function endGame() {
+            const p1Wins = game.p1.score > game.p2.score;
+            const p2Wins = game.p2.score > game.p1.score;
+            const isTie = game.p1.score === game.p2.score;
+
+            let html = '';
+            html += `<div class="final-card${p1Wins ? ' winner' : ''}"><h3>${game.p1.name}</h3><div class="score">${game.p1.score}</div></div>`;
+            html += `<div class="final-card${p2Wins ? ' winner' : ''}"><h3>${game.p2.name}</h3><div class="score">${game.p2.score}</div></div>`;
+            document.getElementById('finalScores').innerHTML = html;
+
+            if (isTie) {
+                document.getElementById('winnerText').textContent = 'TIE! / ¡EMPATE!';
+            } else {
+                const winner = p1Wins ? game.p1.name : game.p2.name;
+                document.getElementById('winnerText').textContent = winner.toUpperCase() + ' WINS! / ¡GANA!';
+            }
+
+            showScreen('endScreen');
+        }
+
+        function updateUI() {
+            document.getElementById('p1Score').textContent = game.p1.name + ': ' + game.p1.score;
+            document.getElementById('p2Score').textContent = game.p2.name + ': ' + game.p2.score;
+            document.getElementById('p1Score').classList.toggle('active', game.currentPlayer === 1);
+            document.getElementById('p2Score').classList.toggle('active', game.currentPlayer === 2);
+
+            const currentName = game[`p${game.currentPlayer}`].name.toUpperCase();
+            document.getElementById('turnText').textContent = '> ' + currentName + ' - YOUR TURN! / ¡TU TURNO!';
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function reset() {
+            clearInterval(game.timerInt);
+            clearInterval(game.shuffleInt);
+            document.getElementById('shuffleContainer').innerHTML = '<div class="center-spotlight"></div>';
+
+            game = {
+                p1: { name: '', score: 0 },
+                p2: { name: '', score: 0 },
+                currentPlayer: 1,
+                remaining: [...scenarios],
+                round: 0,
+                timerInt: null,
+                shuffleInt: null,
+                emojis: []
+            };
+
+            document.getElementById('p1Name').value = '';
+            document.getElementById('p2Name').value = '';
+            updateStartBtn();
+            showScreen('welcomeScreen');
+        }
+    </script>
+</body>
+</html>
