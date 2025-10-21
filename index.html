@@ -143,84 +143,86 @@
             color: #ffeb3b;
         }
 
-        .shuffle-container {
+        .card-container {
             width: 100%;
-            height: 300px;
             background: #001f3f;
             border: 4px solid #ffd700;
             margin: 20px 0;
-            position: relative;
+            padding: 20px;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 10px;
-            padding: 10px;
+            gap: 15px;
         }
 
-        .shuffle-emoji {
-            font-size: 56px;
+        .scenario-card {
+            aspect-ratio: 1;
+            position: relative;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .scenario-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            user-select: none;
-            cursor: default;
-            opacity: 0.8;
+            border: 3px solid #ffd700;
         }
 
-        .shuffle-emoji.shuffling {
-            animation: pulse 0.3s ease-in-out infinite;
+        .card-front {
+            background: linear-gradient(135deg, #003366 0%, #004080 100%);
+            font-size: 40px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .card-back {
+            background: linear-gradient(135deg, #ffd700 0%, #ffeb3b 100%);
+            transform: rotateY(180deg);
+            font-size: 48px;
         }
 
-        .center-spotlight {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
-            border: 4px solid #ffd700;
-            border-radius: 50%;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.3);
-            pointer-events: none;
-            z-index: 5;
-            animation: spotlight-pulse 1.5s ease-in-out infinite;
+        .scenario-card:hover:not(.flipped) .card-front {
+            background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
         }
 
-        @keyframes spotlight-pulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9), inset 0 0 50px rgba(255, 215, 0, 0.5); }
+        .scenario-card.selected {
+            animation: card-selected 0.5s ease forwards;
         }
 
-        .shuffle-emoji.in-spotlight {
-            z-index: 10;
-            opacity: 1;
-        }
-
-        .shuffle-emoji.frozen {
-            animation: none !important;
-        }
-
-        .shuffle-emoji.fading {
-            opacity: 0 !important;
-            transform: scale(0.5) !important;
-            transition: all 0.5s ease;
-        }
-
-        .shuffle-emoji.winner {
-            animation: winner-grow 1s ease forwards !important;
-            z-index: 100;
-        }
-
-        @keyframes winner-grow {
+        @keyframes card-selected {
             0% { transform: scale(1); }
-            50% { transform: scale(2); }
-            100% { transform: scale(2.5); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .scenario-card.fade-out {
+            animation: fade-away 0.5s ease forwards;
+        }
+
+        @keyframes fade-away {
+            to {
+                opacity: 0;
+                transform: scale(0.8);
+            }
         }
 
         .spin-button {
@@ -582,10 +584,17 @@
 
             <div class="turn-indicator" id="turnText"></div>
             <div class="phase-indicator" id="phaseText"></div>
-            <div class="shuffle-container" id="shuffleContainer">
-                <div class="center-spotlight"></div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 14px; color: #ffeb3b; margin-bottom: 10px;">
+                    🎴 PICK A CARD / ELIGE UNA CARTA 🎴
+                </div>
+                <div style="font-size: 11px; color: #87ceeb;">
+                    Click any card to reveal your scenario / Haz clic en cualquier carta
+                </div>
             </div>
-            <button class="spin-button" id="activateBtn">FREEZE! / ¡CONGELA!</button>
+
+            <div class="card-container" id="cardContainer"></div>
 
             <div class="question-container" id="questionDiv">
                 <div class="question-text" id="questionText"></div>
@@ -1203,7 +1212,6 @@
         document.getElementById('p1Name').addEventListener('input', updateStartBtn);
         document.getElementById('p2Name').addEventListener('input', updateStartBtn);
         document.getElementById('startBtn').addEventListener('click', startGame);
-        document.getElementById('activateBtn').addEventListener('click', freezeShuffle);
         document.getElementById('playAgainBtn').addEventListener('click', reset);
 
         document.getElementById('pauseBtn').addEventListener('click', pauseGame);
@@ -1276,96 +1284,57 @@
         }
 
         function startShuffle() {
-            const container = document.getElementById('shuffleContainer');
-            // Clear any existing emojis
-            const emojis = container.querySelectorAll('.shuffle-emoji');
-            emojis.forEach(e => e.remove());
-            game.emojis = [];
+            const container = document.getElementById('cardContainer');
+            container.style.display = 'grid';
+            container.innerHTML = '';
 
-            // Create emoji elements for all remaining scenarios
+            // Create card elements from remaining scenarios
             game.remaining.forEach(scenario => {
-                const el = document.createElement('div');
-                el.className = 'shuffle-emoji shuffling';
-                el.textContent = scenario.emoji;
-                el.dataset.id = scenario.id;
-                container.appendChild(el);
-                game.emojis.push({element: el, scenario: scenario});
-            });
+                const card = document.createElement('div');
+                card.className = 'scenario-card';
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">?</div>
+                        <div class="card-back">${scenario.emoji}</div>
+                    </div>
+                `;
 
-            // Start shuffling positions
-            game.shuffleInt = setInterval(() => {
-                shufflePositions();
-            }, 400);
-        }
-
-        function shufflePositions() {
-            // Fisher-Yates shuffle of the emoji elements
-            const container = document.getElementById('shuffleContainer');
-            const elements = [...container.querySelectorAll('.shuffle-emoji')];
-
-            for (let i = elements.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                // Swap positions by swapping in DOM
-                if (i !== j) {
-                    const temp = elements[i].nextSibling;
-                    container.insertBefore(elements[i], elements[j]);
-                    container.insertBefore(elements[j], temp);
-                }
-            }
-        }
-
-        function freezeShuffle() {
-            document.getElementById('activateBtn').disabled = true;
-            clearInterval(game.shuffleInt);
-
-            // Stop animation
-            game.emojis.forEach(e => e.element.classList.remove('shuffling'));
-            game.emojis.forEach(e => e.element.classList.add('frozen'));
-
-            // Find which emoji is closest to center (in the spotlight)
-            const container = document.getElementById('shuffleContainer');
-            const containerRect = container.getBoundingClientRect();
-            const centerX = containerRect.left + containerRect.width / 2;
-            const centerY = containerRect.top + containerRect.height / 2;
-
-            let closest = null;
-            let minDist = Infinity;
-
-            game.emojis.forEach(item => {
-                const rect = item.element.getBoundingClientRect();
-                const emojiCenterX = rect.left + rect.width / 2;
-                const emojiCenterY = rect.top + rect.height / 2;
-                const dist = Math.sqrt(
-                    Math.pow(centerX - emojiCenterX, 2) +
-                    Math.pow(centerY - emojiCenterY, 2)
-                );
-                if (dist < minDist) {
-                    minDist = dist;
-                    closest = item;
-                }
-            });
-
-            // Animate selection
-            setTimeout(() => {
-                game.emojis.forEach(item => {
-                    if (item === closest) {
-                        item.element.classList.add('winner');
-                        item.element.classList.add('in-spotlight');
-                    } else {
-                        item.element.classList.add('fading');
+                // Add click handler to flip and select
+                card.addEventListener('click', function() {
+                    if (!card.classList.contains('flipped')) {
+                        selectCard(card, scenario);
                     }
                 });
 
+                container.appendChild(card);
+            });
+        }
+
+        function selectCard(cardElement, scenario) {
+            // Flip the selected card
+            cardElement.classList.add('flipped');
+
+            // After flip animation, fade other cards and show question
+            setTimeout(() => {
+                const allCards = document.querySelectorAll('.scenario-card');
+                allCards.forEach(card => {
+                    if (card !== cardElement) {
+                        card.style.opacity = '0.3';
+                        card.style.pointerEvents = 'none';
+                    }
+                });
+
+                // Highlight selected card
+                cardElement.style.transform = 'scale(1.1)';
+                cardElement.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.8)';
+
                 setTimeout(() => {
-                    showQuestion(closest.scenario);
-                    game.remaining = game.remaining.filter(x => x.id !== closest.scenario.id);
-                    container.innerHTML = '<div class="center-spotlight"></div>';
-                    game.emojis = [];
-                    container.style.display = 'none';
-                    document.getElementById('activateBtn').style.display = 'none';
+                    showQuestion(scenario);
+                    game.remaining = game.remaining.filter(x => x.id !== scenario.id);
+                    document.getElementById('cardContainer').style.display = 'none';
                     startTimer();
-                }, 1500);
-            }, 500);
+                }, 1000);
+            }, 600);
         }
 
         function showQuestion(scenario) {
@@ -1552,9 +1521,6 @@
                 game.currentPlayer = game.currentPlayer === 1 ? 2 : 1;
                 game.currentPhase = null;
                 setTimeout(() => {
-                    document.getElementById('shuffleContainer').style.display = 'grid';
-                    document.getElementById('activateBtn').style.display = 'block';
-                    document.getElementById('activateBtn').disabled = false;
                     document.getElementById('scoringSection').style.display = 'none';
                     document.getElementById('questionDiv').style.display = 'none';
                     document.querySelector('.vocab-box').style.opacity = '1';
