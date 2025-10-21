@@ -605,6 +605,18 @@
                     <div class="timer-fill" id="timerFill">120s</div>
                 </div>
 
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="skipReadBtn" style="display: none; background: #87ceeb; border-color: #87ceeb;">
+                        READY! SKIP TO PREPARE / ¡LISTO! SALTAR →
+                    </button>
+                    <button id="skipPrepareBtn" style="display: none; background: #87ceeb; border-color: #87ceeb;">
+                        READY TO SPEAK! / ¡LISTO PARA HABLAR! →
+                    </button>
+                    <button id="doneSpeakingBtn" style="display: none; background: #4CAF50; border-color: #4CAF50; font-size: 16px; padding: 20px 40px;">
+                        ✓ DONE SPEAKING / TERMINÉ DE HABLAR →
+                    </button>
+                </div>
+
                 <div id="scoringSection" style="display: none; background: #002855; border: 3px solid #ffd700; padding: 20px; margin-top: 20px;">
                     <h3 style="font-size: 14px; color: #ffd700; margin-bottom: 20px;">SCORE YOUR PARTNER / CALIFICA A TU COMPAÑERO</h3>
 
@@ -1181,6 +1193,22 @@
 
         document.getElementById('submitScoreBtn').addEventListener('click', submitScore);
 
+        // Skip ahead buttons
+        document.getElementById('skipReadBtn').addEventListener('click', () => {
+            clearInterval(game.timerInt);
+            startPreparePhase(game.currentScenario);
+        });
+
+        document.getElementById('skipPrepareBtn').addEventListener('click', () => {
+            clearInterval(game.timerInt);
+            startSpeakPhase(game.currentScenario);
+        });
+
+        document.getElementById('doneSpeakingBtn').addEventListener('click', () => {
+            clearInterval(game.timerInt);
+            showScoring();
+        });
+
         function updateStartBtn() {
             const p1 = document.getElementById('p1Name').value.trim();
             const p2 = document.getElementById('p2Name').value.trim();
@@ -1307,6 +1335,11 @@
             document.querySelector('.sentence-frames').style.display = 'none';
             document.getElementById('scoringSection').style.display = 'none';
 
+            // Show skip button for read phase
+            document.getElementById('skipReadBtn').style.display = 'block';
+            document.getElementById('skipPrepareBtn').style.display = 'none';
+            document.getElementById('doneSpeakingBtn').style.display = 'none';
+
             document.getElementById('questionDiv').style.display = 'block';
 
             // Start Phase 1 timer (30 seconds)
@@ -1335,6 +1368,11 @@
             document.querySelector('.vocab-box').style.display = 'block';
             document.querySelector('.sentence-frames').style.display = 'block';
 
+            // Show skip button for prepare phase
+            document.getElementById('skipReadBtn').style.display = 'none';
+            document.getElementById('skipPrepareBtn').style.display = 'block';
+            document.getElementById('doneSpeakingBtn').style.display = 'none';
+
             // Start Phase 2 timer (45 seconds)
             startPhaseTimer(45, 'prepare', () => {
                 // Phase 3: SPEAK (90 seconds)
@@ -1351,6 +1389,11 @@
             document.querySelector('.vocab-box').style.opacity = '0.7';
             document.querySelector('.sentence-frames').style.opacity = '0.7';
 
+            // Show "Done Speaking" button - the most important one!
+            document.getElementById('skipReadBtn').style.display = 'none';
+            document.getElementById('skipPrepareBtn').style.display = 'none';
+            document.getElementById('doneSpeakingBtn').style.display = 'block';
+
             // Start Phase 3 timer (90 seconds)
             startPhaseTimer(90, 'speak', () => {
                 // Time's up - show scoring
@@ -1362,6 +1405,11 @@
             clearInterval(game.timerInt);
             game.currentPhase = 'scoring';
             document.getElementById('phaseText').textContent = '📊 TIME TO SCORE / HORA DE CALIFICAR';
+
+            // Hide all skip buttons
+            document.getElementById('skipReadBtn').style.display = 'none';
+            document.getElementById('skipPrepareBtn').style.display = 'none';
+            document.getElementById('doneSpeakingBtn').style.display = 'none';
 
             // Hide question details, show scoring
             document.getElementById('questionDiv').style.display = 'none';
